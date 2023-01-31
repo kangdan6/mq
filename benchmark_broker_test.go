@@ -71,7 +71,7 @@ func BenchmarkBroker_send(b *testing.B) {
 	}
 	for i := 0; i < b.N; i++ {
 		for _, tc := range testCases {
-			b, _ := NewBroker(tc.topics, tc.capacity)
+			b, _ := NewBroker(tc.capacity, tc.topics...)
 			ctx, cancel := context.WithTimeout(context.Background(), tc.timeout)
 			defer cancel()
 			// 发送 sendtimes 次消息
@@ -133,7 +133,7 @@ func BenchmarkBroker_subscribe(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		for _, tc := range testCases {
-			b, _ := NewBroker(tc.topics, 10000)
+			b, _ := NewBroker(10000, tc.topics...)
 
 			go func() {
 				msgs, _ := b.Subscribe(tc.consumerTopic)

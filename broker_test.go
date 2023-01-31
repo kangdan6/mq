@@ -54,7 +54,7 @@ func TestBrokerTopic_NewBroker(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := NewBroker(tc.topics, tc.capacity)
+			b, err := NewBroker(tc.capacity, tc.topics...)
 			assert.Equal(t, tc.wantErr, err)
 			if err != nil {
 				return
@@ -114,7 +114,7 @@ func TestBrokerTopic_send(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := NewBroker(tc.topics, tc.capacity)
+			b, err := NewBroker(tc.capacity, tc.topics...)
 			assert.NoError(t, err)
 			ctx, cancel := context.WithTimeout(context.Background(), tc.timeout)
 			defer cancel()
@@ -174,7 +174,7 @@ func TestBrokerTopic_subscribe(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := NewBroker(tc.topics, tc.capacity)
+			b, err := NewBroker(tc.capacity, tc.topics...)
 			assert.NoError(t, err)
 
 			go func() {
@@ -200,7 +200,7 @@ func TestBrokerTopic_subscribe(t *testing.T) {
 
 func TestBrokerTopic(t *testing.T) {
 	// 并发测试，只是测试有没有死锁之类的问题
-	b, err := NewBroker([]string{"topic1"}, 1000)
+	b, err := NewBroker(1000, "topic1")
 	assert.NoError(t, err)
 
 	// 模拟发送者

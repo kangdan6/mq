@@ -30,7 +30,7 @@ type Broker struct {
 // NewBroker 创建基于内存的消息队列
 // topics注册的主题，必须提前注册
 // capacity 容量 必须大于0
-func NewBroker(topics []string, capacity int) (*Broker, error) {
+func NewBroker(capacity int, topics ...string) (*Broker, error) {
 	if capacity <= 0 {
 		return nil, errors.New("capacity 错误")
 	}
@@ -60,12 +60,13 @@ func (b *Broker) Topics() ([]string, error) {
 func (b *Broker) Send(ctx context.Context, topic string, m Msg) error {
 	// 加读锁 防止其他人写
 	b.mutex.RLock()
-	defer b.mutex.RUnlock()
 	// 如果topic不存在则报错
 	if _, ok := b.topics[topic]; !ok {
+		b.mutex.RUnlock()
 		return errors.New("topic 错误")
 	}
 	chans := b.topics[topic]
+	b.mutex.RUnlock()
 	for _, ch := range chans {
 		select {
 		case ch <- m:
